@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Pass Tracker - Fortnite Hub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        /* Main content styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            /* justify-content: center; */
+            /* justify-items: center; */
+            /* justify-self: center; */
+            flex: 1;
+            padding: 2rem;
+            width: 100%;
+            /* max-width: 1200px; */
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://cdn2.unrealengine.com/fortnite-chapter-6-season-1-hunters-header-1900x600-d64708d185cf.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: clamp(1.5rem, 5vw, 3rem);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+        }
+
+        /* Enhanced Section Styles */
+        .section {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: clamp(1rem, 3vw, 2rem);
+            margin-bottom: 2rem;
+        }
+
+        /* Battle Pass Progress Tracker specific styles */
+        .progress-container {
+            background: var(--surface-hover);
+            border-radius: 12px;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            margin: 1rem 0;
+        }
+
+        .progress-container button {
+            width: 100%;
+        }
+
+        /* input[type="text"],
+        input[type="number"],
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            background: var(--surface);
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        } */
+
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), #ff4f8b);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .level-marker {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .info-card {
+            background: var(--surface-hover);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .tutorial-section {
+            background: var(--surface-hover);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .tip-box {
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            background: rgba(79, 179, 255, 0.1);
+        }
+
+        .reward-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .reward-card {
+            background: var(--surface-hover);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .reward-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .reward-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .reward-info {
+            padding: 1rem;
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: clamp(0.75rem, 2vw, 1rem);
+            margin-top: 1rem;
+        }
+
+        .challenge-card {
+            background: var(--surface-hover);
+            border-radius: 12px;
+            padding: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .challenge-progress {
+            height: 8px;
+            background: var(--surface);
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .challenge-progress-bar {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .xp-calculator {
+            background: var(--surface-hover);
+            border-radius: 12px;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            margin: 1rem 0;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .time-remaining {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .countdown-card {
+            /* display: flex; */
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .time-card {
+            background: var(--surface-hover);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            flex: 1;
+        }
+
+        .time-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .required-xp {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(79, 179, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .reward-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .reward-card {
+            background: linear-gradient(145deg, var(--surface-hover), var(--surface));
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .reward-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .reward-image-container {
+            position: relative;
+            padding-top: 100%;
+            overflow: hidden;
+            background: linear-gradient(45deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6));
+        }
+
+        .reward-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .reward-card:hover .reward-image {
+            transform: scale(1.05);
+        }
+
+        .reward-level {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .reward-info {
+            padding: 1.5rem;
+            background: linear-gradient(180deg, 
+                rgba(var(--surface-rgb), 0.9) 0%,
+                rgba(var(--surface-rgb), 1) 100%);
+        }
+
+        .reward-info h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            color: #fff;
+        }
+
+        .reward-info p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .reward-info .description {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .requirement-notice {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .requirement-notice i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .requirement-notice-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (max-width: 768px) {
+        .reward-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            padding: 0.5rem;
+        }
+
+        .reward-info {
+            padding: 1rem;
+        }
+
+        .reward-info h3 {
+            font-size: 1.1rem;
+        }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding-top: 4rem;
+            }
+        }
+
+        .coming-soon {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 4rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .challenge-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .time-remaining {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section {
+                padding: 1.25rem;
+            }
+
+            .section {
+                padding: 1rem;
+            }
+
+            .time-remaining {
+                grid-template-columns: 1fr;
+            }
+
+            .xp-calculator {
+                padding: 1rem;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            button {
+                padding: 0.625rem;
+            }
+        }
+
+        body.sidebar-active {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar from original -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Fortnite Hub</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="shop.html" class="nav-link"><i class="fas fa-shop"></i> Shop</a></li>
+            <li><a href="challengeTracker.html" class="nav-link"><i class="fas fa-tasks"></i> Challenges</a></li>
+            <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
+            <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
+            <li><a href="news.html" class="nav-link"><i class="fas fa-newspaper"></i> News</a></li>
+            <li><a href="tournament.html" class="nav-link"><i class="fas fa-trophy"></i> Tournaments</a></li>
+            <li><a href="stats.html" class="nav-link"><i class="fas fa-chart-bar"></i> Stats</a></li>
+            <li><a href="battlepass.html" class="nav-link active"><i class="fas fa-star"></i> Battle Pass Tracker</a></li>
+            <li><a href="aes.html" class="nav-link"><i class="fas fa-key"></i> AES Keys</a></li>
+        </ul>
+    </nav>
+
+        <div class="main-content">
+            <section class="hero-section">
+                <h1>Battle Pass Progress Tracker</h1>
+                <p>Track your Battle Pass progression, upcoming rewards, and optimize your XP gains!</p>
+            </section>
+
+            <section class="section">
+                <h2>Battle Pass Progress</h2>
+                <div class="progress-container">
+                    <input type="text" id="username" placeholder="Enter your Epic Games username" 
+                        style="padding: 0.5rem; width: 100%; margin-bottom: 1rem; background: var(--surface); color: var(--text); border: none; border-radius: 8px;">
+                    <button onclick="trackProgress()" 
+                        style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Track Progress
+                    </button>
+                    
+                    <div class="progress-bar">
+                        <div class="progress" id="battlePassProgress"></div>
+                    </div>
+                    <div class="level-marker">
+                        <span id="battlePassLevel">Level 0</span>
+                        <span>Level 200</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" style="display: none;">
+                <h2>Challenge Tracking</h2>
+                <div class="challenge-grid" id="challengeGrid">
+                    <!-- Challenges will be populated here -->
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>XP Calculator</h2>
+                <div class="xp-calculator">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label>Current Level</label>
+                            <input type="number" id="currentLevel" class="form-input" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; background: var(--surface); color: var(--text); border: none; border-radius: 8px;">
+                        </div>
+                        <div>
+                            <label>Target Level</label>
+                            <input type="number" id="targetLevel" class="form-input" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; background: var(--surface); color: var(--text); border: none; border-radius: 8px;">
+                        </div>
+                    </div>
+                    <button onclick="calculateXP()" style="width: 100%; margin-top: 1rem; padding: 0.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Calculate Required XP
+                    </button>
+                    <div id="xpResult" class="required-xp" style="display: none;"></div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Battle Pass Rewards</h2>
+                <div class="reward-grid" id="battlePassRewards">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        Loading Battle Pass rewards...
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Season Time Management</h2>
+                <div class="time-remaining">
+                    <div class="time-card">
+                        <div class="time-value" id="daysLeft">--</div>
+                        <div>Days</div>
+                    </div>
+                    <div class="time-card">
+                        <div class="time-value" id="hoursLeft">--</div>
+                        <div>Hours</div>
+                    </div>
+                    <div class="time-card">
+                        <div class="time-value" id="minutesLeft">--</div>
+                        <div>Minutes</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- <section class="section">
+            <h2>Getting Started Guide</h2>
+            
+            <div class="tutorial-section">
+                <h3><i class="fas fa-star"></i> Understanding Battle Pass</h3>
+                <p>The Battle Pass is a seasonal progression system that rewards players with exclusive cosmetics, V-Bucks, and other in-game items. Each season typically lasts around 10 weeks.</p>
+                
+                <div class="tip-box">
+                    <strong>Pro Tip:</strong> Purchase the Battle Pass early in the season to maximize your rewards and have access to additional weekly challenges!
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-chart-line"></i> XP System</h3>
+                    <p>Battle Pass progression is based on XP gained through:</p>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Daily Quests (1,000 XP each)</li>
+                        <li>Weekly Challenges (15,000-30,000 XP)</li>
+                        <li>Milestone Challenges (Progressive XP)</li>
+                        <li>Regular gameplay activities</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar-alt"></i> Season Timeline</h3>
+                    <p>Current Season Details:</p>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Start Date: [Dynamic Date]</li>
+                        <li>End Date: [Dynamic Date]</li>
+                        <li>Super Level Styles Unlock: Level 100+</li>
+                    </ul>
+                </div>
+            </div>
+        </section> -->
+
+        <!-- <section class="section">
+            <h2>Featured Rewards</h2>
+            <div class="reward-grid">
+                <div class="reward-card">
+                    <img src="/api/placeholder/200/200" alt="Battle Pass Skin" class="reward-image">
+                    <div class="reward-info">
+                        <h3>Tier 100 Outfit</h3>
+                        <p>Unlock at Level 100</p>
+                    </div>
+                </div>
+                <div class="reward-card">
+                    <img src="/api/placeholder/200/200" alt="Emote" class="reward-image">
+                    <div class="reward-info">
+                        <h3>Exclusive Emote</h3>
+                        <p>Unlock at Level 50</p>
+                    </div>
+                </div>
+                <div class="reward-card">
+                    <img src="/api/placeholder/200/200" alt="Pickaxe" class="reward-image">
+                    <div class="reward-info">
+                        <h3>Harvesting Tool</h3>
+                        <p>Unlock at Level 75</p>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+
+        <!-- <section class="section">
+            <h2>XP Optimization Tips</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-lightbulb"></i> Daily Routine</h3>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Complete all daily challenges</li>
+                        <li>Play at least one Team Rumble match</li>
+                        <li>Visit new POIs for discovery XP</li>
+                        <li>Complete NPC quests</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-trophy"></i> Weekly Goals</h3>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Complete all weekly challenges</li>
+                        <li>Progress milestone challenges</li>
+                        <li>Participate in special events</li>
+                        <li>Complete bonus goals</li>
+                    </ul>
+                </div>
+            </div>
+        </section> -->
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+        const body = document.body;
+
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('active');
+            body.classList.toggle('sidebar-active');
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                !menuBtn.contains(e.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                body.classList.remove('sidebar-active');
+            }
+        });
+
+        // Handle resize events
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                body.classList.remove('sidebar-active');
+            }
+        });
+
+        // First, modify the trackProgress function to better handle API responses:
+
+        async function trackProgress() {
+            const username = document.getElementById('username').value;
+            const messageHtml = `
+            <div id="messageContainer" style="display: none;"></div>
+            `;
+            const progressBar = document.getElementById('battlePassProgress');
+            const progressTxt = document.getElementById('battlePassLevel');
+            
+            try {
+                // First, get account ID using the lookup endpoint
+                const lookupResponse = await fetch(`https://fortnite-api.com/v2/stats/br/v2/by-name/${encodeURIComponent(username)}`, {
+                    headers: {
+                        // Replace with your actual API key from fortnite-api.com
+                        'Authorization': 'ac134d74-7783-4e98-aeca-33a02c2c4834'
+                    }
+                });
+
+                if (!lookupResponse.ok) {
+                    if (lookupResponse.status === 401) {
+                        throw new Error('Invalid API key. Please check your API configuration.');
+                    } else if (lookupResponse.status === 404) {
+                        throw new Error('Player not found. Please check the username and try again.');
+                    } else {
+                        throw new Error(`API error (${lookupResponse.status}). Please try again later.`);
+                    }
+                }
+
+                const data = await lookupResponse.json();
+                
+                // Safely handle the response
+                if (data.data && data.data.stats && data.data.stats.all) {
+                    // For demonstration, we'll use account level since battle pass level isn't directly available
+                    const level = data.data.stats.all.level || 0;
+                    
+                    // Update progress bar (max level 200)
+                    const progress = Math.min((level / 200) * 100, 100);
+                    progressBar.style.width = `${progress}%`;
+                    progressTxt.textContent = `Level ${level}`;
+
+                    // Auto-fill XP calculator
+                    document.getElementById('currentLevel').value = level;
+
+                    // Show success message
+                    showMessage('success', `Successfully retrieved stats for ${username}`);
+                } else {
+                    throw new Error('No stats available for this player');
+                }
+
+            } catch (error) {
+                console.error('Error fetching battle pass progress:', error);
+                showMessage('error', error.message);
+                
+                // Reset progress on error
+                progressBar.style.width = '0%';
+                progressTxt.textContent = 'Level 0';
+            }
+        }
+
+        // Now add the mode countdown data and functions:
+
+        const modeData = {
+            season: {
+                endDate: '2025-05-02T11:00:00',
+                label: 'Battle Pass Season'
+            },
+            festival: {
+                endDate: '2025-04-08',
+                label: 'Fortnite Festival Season'
+            },
+            lego: {
+                endDate: '2025-03-11',
+                label: 'LEGO Fortnite Event'
+            },
+            og: {
+                endDate: '2025-03-25',
+                label: 'OG Season'
+            }
+        };
+
+        function getTimeRemaining(endDate) {
+            const end = new Date(endDate);
+            const now = new Date();
+            const diff = end - now;
+
+            return {
+                days: Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24))),
+                hours: Math.max(0, Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))),
+                minutes: Math.max(0, Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)))
+            };
+        }
+
+        function updateAllCountdowns() {
+            Object.entries(modeData).forEach(([mode, data]) => {
+                const time = getTimeRemaining(data.endDate);
+                const daysElement = document.getElementById(`${mode}Days`);
+                const hoursElement = document.getElementById(`${mode}Hours`);
+                const minutesElement = document.getElementById(`${mode}Minutes`);
+                const endDateElement = document.getElementById(`${mode}EndDate`);
+                
+                if (daysElement) daysElement.textContent = time.days;
+                if (hoursElement) hoursElement.textContent = time.hours;
+                if (minutesElement) minutesElement.textContent = time.minutes;
+                
+                if (endDateElement) {
+                    const formattedDate = new Date(data.endDate).toLocaleDateString();
+                    endDateElement.textContent = `Ends: ${formattedDate}`;
+                }
+            });
+        }
+
+        function createModeCountdowns() {
+            const section = document.createElement('section');
+            section.className = 'section';
+            section.innerHTML = `
+                <h2>Mode Countdowns</h2>
+                <div class="mode-countdowns" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <!-- Festival countdown -->
+                    <div class="countdown-card" style="background: var(--surface-hover); border-radius: 12px; padding: 1rem;">
+                        <h3>Fortnite Festival</h3>
+                        <div class="time-remaining">
+                            <div class="time-card">
+                                <div class="time-value" id="festivalDays">--</div>
+                                <div>Days</div>
+                            </div>
+                            <div class="time-card">
+                                <div class="time-value" id="festivalHours">--</div>
+                                <div>Hours</div>
+                            </div>
+                            <div class="time-card">
+                                <div class="time-value" id="festivalMinutes">--</div>
+                                <div>Minutes</div>
+                            </div>
+                        </div>
+                        <div id="festivalEndDate" class="end-date" style="text-align: center; margin-top: 0.5rem; color: var(--text-muted);"></div>
+                    </div>
+
+                    <!-- LEGO countdown -->
+                    <div class="countdown-card" style="background: var(--surface-hover); border-radius: 12px; padding: 1rem;">
+                        <h3>LEGO Fortnite</h3>
+                        <div class="time-remaining">
+                            <div class="time-card">
+                                <div class="time-value" id="legoDays">--</div>
+                                <div>Days</div>
+                            </div>
+                            <div class="time-card">
+                                <div class="time-value" id="legoHours">--</div>
+                                <div>Hours</div>
+                            </div>
+                            <div class="time-card">
+                                <div class="time-value" id="legoMinutes">--</div>
+                                <div>Minutes</div>
+                            </div>
+                        </div>
+                        <div id="legoEndDate" class="end-date" style="text-align: center; margin-top: 0.5rem; color: var(--text-muted);"></div>
+                    </div>
+
+                    <!-- OG countdown -->
+                    <div class="countdown-card" style="background: var(--surface-hover); border-radius: 12px; padding: 1rem;">
+                        <h3>Fortnite OG</h3>
+                        <div class="time-remaining">
+                            <div class="time-card">
+                                <div class="time-value" id="ogDays">--</div>
+                                <div>Days</div>
+                            </div>
+                            <div class="time-card">
+                                <div class="time-value" id="ogHours">--</div>
+                                <div>Hours</div>
+                            </div>
+                            <div class="time-card">
+                                <div class="time-value" id="ogMinutes">--</div>
+                                <div>Minutes</div>
+                            </div>
+                        </div>
+                        <div id="ogEndDate" class="end-date" style="text-align: center; margin-top: 0.5rem; color: var(--text-muted);"></div>
+                    </div>
+                </div>
+            `;
+            return section;
+        }
+
+        // Add this new section to your HTML just after the existing time-remaining section:
+
+        // const newTimeSection = `
+        // <section class="section">
+        //     <h2>Mode Countdowns</h2>
+        //     <div class="mode-countdowns" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        //         <!-- Festival countdown -->
+        //         <div class="countdown-card" style="background: var(--surface-hover); border-radius: 12px; padding: 1rem;">
+        //             <h3>Fortnite Festival</h3>
+        //             <div class="time-remaining">
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="festivalDays">--</div>
+        //                     <div>Days</div>
+        //                 </div>
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="festivalHours">--</div>
+        //                     <div>Hours</div>
+        //                 </div>
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="festivalMinutes">--</div>
+        //                     <div>Minutes</div>
+        //                 </div>
+        //             </div>
+        //             <div id="festivalEndDate" class="end-date" style="text-align: center; margin-top: 0.5rem; color: var(--text-muted);"></div>
+        //         </div>
+
+        //         <!-- LEGO countdown -->
+        //         <div class="countdown-card" style="background: var(--surface-hover); border-radius: 12px; padding: 1rem;">
+        //             <h3>LEGO Fortnite</h3>
+        //             <div class="time-remaining">
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="legoDays">--</div>
+        //                     <div>Days</div>
+        //                 </div>
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="legoHours">--</div>
+        //                     <div>Hours</div>
+        //                 </div>
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="legoMinutes">--</div>
+        //                     <div>Minutes</div>
+        //                 </div>
+        //             </div>
+        //             <div id="legoEndDate" class="end-date" style="text-align: center; margin-top: 0.5rem; color: var(--text-muted);"></div>
+        //         </div>
+
+        //         <!-- og countdown -->
+        //         <div class="countdown-card" style="background: var(--surface-hover); border-radius: 12px; padding: 1rem;">
+        //             <h3>Rocket og</h3>
+        //             <div class="time-remaining">
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="ogDays">--</div>
+        //                     <div>Days</div>
+        //                 </div>
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="ogHours">--</div>
+        //                     <div>Hours</div>
+        //                 </div>
+        //                 <div class="time-card">
+        //                     <div class="time-value" id="ogMinutes">--</div>
+        //                     <div>Minutes</div>
+        //                 </div>
+        //             </div>
+        //             <div id="ogEndDate" class="end-date" style="text-align: center; margin-top: 0.5rem; color: var(--text-muted);"></div>
+        //         </div>
+        //     </div>
+        // </section>
+        // `;
+
+        function calculateXP() {
+            const currentLevel = parseInt(document.getElementById('currentLevel').value) || 0;
+            const targetLevel = parseInt(document.getElementById('targetLevel').value) || 0;
+            const xpPerLevel = 80000; // Standard XP per level
+            
+            if (targetLevel <= currentLevel) {
+                alert('Target level must be higher than current level');
+                return;
+            }
+
+            const requiredXP = (targetLevel - currentLevel) * xpPerLevel;
+            const result = document.getElementById('xpResult');
+            
+            if (result) {
+                result.style.display = 'block';
+                
+                // Calculate various XP sources
+                const dailyChallengesXP = 3 * 15000; // 3 daily challenges at 15k XP each
+                const weeklyChallengesXP = 70000; // Average weekly challenges XP
+                const daysNeeded = Math.ceil(requiredXP / dailyChallengesXP);
+                const weeksNeeded = Math.ceil(requiredXP / weeklyChallengesXP);
+                
+                // Calculate estimated time with combined XP sources
+                const combinedDailyXP = dailyChallengesXP + (10000 * 3); // Daily challenges + estimated gameplay XP
+                const daysWithGameplay = Math.ceil(requiredXP / combinedDailyXP);
+
+                result.innerHTML = `
+                    <h3>Required XP: ${requiredXP.toLocaleString()}</h3>
+                    <p>Estimated time to achieve:</p>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Daily Challenges only: ~${daysNeeded} days</li>
+                        <li>Weekly Challenges only: ~${weeksNeeded} weeks</li>
+                        <li>Combined (Daily + Gameplay): ~${daysWithGameplay} days</li>
+                    </ul>
+                    <div class="tip-box" style="margin-top: 1rem; padding: 1rem; background: rgba(79, 179, 255, 0.1); border-radius: 8px;">
+                        <strong>💡 Pro Tip:</strong> Combine daily challenges, weekly quests, and regular gameplay for fastest leveling.
+                        Each match can give 5-15k XP depending on performance.
+                    </div>
+                `;
+            }
+
+            // Update visual aids
+            updateXPProgressBar(currentLevel, targetLevel);
+        }
+
+        // Helper function to update XP progress visualization
+        function updateXPProgressBar(currentLevel, targetLevel) {
+            const progressBar = document.createElement('div');
+            progressBar.style.width = '100%';
+            progressBar.style.height = '8px';
+            progressBar.style.backgroundColor = 'var(--surface)';
+            progressBar.style.borderRadius = '4px';
+            progressBar.style.marginTop = '1rem';
+            progressBar.style.overflow = 'hidden';
+
+            const progress = document.createElement('div');
+            const percentage = (currentLevel / targetLevel) * 100;
+            progress.style.width = `${Math.min(percentage, 100)}%`;
+            progress.style.height = '100%';
+            progress.style.backgroundColor = 'var(--primary)';
+            progress.style.transition = 'width 0.3s ease';
+
+            progressBar.appendChild(progress);
+
+            const result = document.getElementById('xpResult');
+            if (result) {
+                // Remove existing progress bar if it exists
+                const existingBar = result.querySelector('.xp-progress-bar');
+                if (existingBar) {
+                    existingBar.remove();
+                }
+                progressBar.classList.add('xp-progress-bar');
+                result.appendChild(progressBar);
+            }
+        }
+
+        const battlePassRewards = [
+        {
+            name: "Nyanja",
+            type: "Outfit",
+            requiredLevel: 1,
+            image: "https://fortnite-api.com/images/cosmetics/br/character_slicevine_loopplum/icon.png",
+            requiresBattlePass: true,
+            description: "Two-tailed trickster."
+        },
+        {
+            name: "Jade",
+            type: "Outfit",
+            requiredLevel: 14,
+            image: "https://fortnite-api.com/images/cosmetics/br/character_polishedjade_mind/icon.png",
+            requiresBattlePass: true,
+            description: "Discover the Island's myths."
+        },
+        {
+            name: "Kendo",
+            type: "Outfit",
+            requiredLevel: 28,
+            image: "https://fortnite-api.com/images/cosmetics/br/character_cubicvice_dual/icon.png",
+            requiresBattlePass: true,
+            description: "A wandering rōnin with a restless spirit."
+        },
+        {
+            name: "Shadow Blade Hope",
+            type: "Outfit",
+            requiredLevel: 42,
+            image: "https://fortnite-api.com/images/cosmetics/br/character_ironlilac_sly/icon.png",
+            requiresBattlePass: true,
+            description: "See through the shadows."
+        },
+        {
+            name: "Daigo",
+            type: "Outfit",
+            requiredLevel: 56,
+            image: "https://fortnite-api.com/images/cosmetics/br/character_mistmylar_claw/icon.png",
+            requiresBattlePass: true,
+            description: "Man of a thousand faces."
+        },
+        {
+            name: "Hero Baymax",
+            type: "Outfit",
+            requiredLevel: 70,
+            image: "https://fortnite-api.com/images/cosmetics/br/character_oysterknock/icon.png",
+            requiresBattlePass: true,
+            description: "Ready to be your hero."
+        },
+        {
+            name: "The Night Rose",
+            type: "Outfit",
+            requiredLevel: 85,
+            image: "https://fortnite-api.com/images/cosmetics/br/character_rosedepth_seed/icon.png",
+            requiresBattlePass: true,
+            description: "A fearsome demon warrior, bound by ancient duty."
+        },
+        {
+            name: "Godzilla",
+            type: "Bonus",
+            requiredLevel: "Bonus",
+            image: "https://fortnite-api.com/images/cosmetics/br/character_blondejaw/icon.png",
+            requiresBattlePass: true,
+            description: "King of the Monsters."
+        }
+        ];
+
+        const styles = `
+        <style>
+            .reward-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+            }
+
+            .reward-card {
+            background: linear-gradient(145deg, var(--surface-hover), var(--surface));
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .reward-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            .reward-image-container {
+            position: relative;
+            padding-top: 100%;
+            overflow: hidden;
+            background: linear-gradient(45deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6));
+            }
+
+            .reward-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            }
+
+            .reward-card:hover .reward-image {
+            transform: scale(1.05);
+            }
+
+            .reward-level {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .reward-info {
+            padding: 1.5rem;
+            background: linear-gradient(180deg, 
+                rgba(var(--surface-rgb), 0.9) 0%,
+                rgba(var(--surface-rgb), 1) 100%);
+            }
+
+            .reward-info h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            color: #fff;
+            }
+
+            .reward-info p {
+            margin: 0;
+            opacity: 0.8;
+            }
+
+            .reward-info .description {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            }
+
+            .requirement-notice {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .requirement-notice i {
+            color: var(--primary);
+            font-size: 1rem;
+            }
+
+            .requirement-notice-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            }
+
+            @media (max-width: 768px) {
+            .reward-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+                padding: 0.5rem;
+            }
+
+            .reward-info {
+                padding: 1rem;
+            }
+
+            .reward-info h3 {
+                font-size: 1.1rem;
+            }
+            }
+        </style>
+        `;
+
+        // Function to display battle pass rewards
+        function displayBattlePassRewards() {
+            if (!document.querySelector('#reward-styles')) {
+                const styleElement = document.createElement('div');
+                styleElement.id = 'reward-styles';
+                styleElement.innerHTML = styles;
+                document.head.appendChild(styleElement);
+            }
+
+            const container = document.getElementById('battlePassRewards');
+            container.innerHTML = '';
+
+
+            battlePassRewards.forEach(reward => {
+                const card = document.createElement('div');
+                card.className = 'reward-card';
+                
+                const notice = reward.requiresBattlePass ? `
+                <div class="requirement-notice">
+                    <i class="fas fa-lock"></i>
+                    <span class="requirement-notice-text">
+                    Requires Battle Pass
+                    </span>
+                </div>
+                ` : '';
+
+                card.innerHTML = `
+                <div class="reward-image-container">
+                    <img src="${reward.image}" 
+                    class="reward-image" 
+                    alt="${reward.name}"
+                    loading="lazy">
+                    <div class="reward-level">${typeof reward.requiredLevel === 'number' ? 'Level ' + reward.requiredLevel : reward.requiredLevel}</div>
+                </div>
+                <div class="reward-info">
+                    <h3>${reward.name}</h3>
+                    <p>${reward.type}</p>
+                    <p class="description">${reward.description}</p>
+                    ${notice}
+                </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add the mode countdowns section
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.appendChild(createModeCountdowns());
+            }
+
+            // Start the countdown updates
+            updateAllCountdowns();
+            setInterval(updateAllCountdowns, 60000); // Update every minute
+
+            displayBattlePassRewards();
+
+            // Initialize the original Battle Pass tracking functionality
+            const seasonData = {
+                startDate: '2025-01-01',
+                endDate: '2025-02-21',
+                xpPerLevel: 80000
+            };
+
+            // Update the original season countdown
+            function updateTimeRemaining() {
+                const end = new Date(seasonData.endDate);
+                const now = new Date();
+                const diff = end - now;
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                const daysElement = document.getElementById('daysLeft');
+                const hoursElement = document.getElementById('hoursLeft');
+                const minutesElement = document.getElementById('minutesLeft');
+
+                if (daysElement) daysElement.textContent = Math.max(0, days);
+                if (hoursElement) hoursElement.textContent = Math.max(0, hours);
+                if (minutesElement) minutesElement.textContent = Math.max(0, minutes);
+            }
+
+            const calculateButton = document.querySelector('button[onclick="calculateXP()"]');
+            if (calculateButton) {
+                calculateButton.addEventListener('click', calculateXP);
+            }
+
+            const levelInputs = document.querySelectorAll('input[type="number"]');
+            levelInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // Remove non-numeric characters
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    
+                    // Ensure value is within reasonable range (1-1000)
+                    if (this.value > 1000) this.value = 1000;
+                    if (this.value < 0) this.value = 0;
+                });
+            });
+
+            // const currentLevelInput = document.getElementById('currentLevel');
+            // const targetLevelInput = document.getElementById('targetLevel');
+            
+            // if (currentLevelInput && targetLevelInput) {
+            //     [currentLevelInput, targetLevelInput].forEach(input => {
+            //         input.addEventListener('input', () => {
+            //             if (currentLevelInput.value && targetLevelInput.value) {
+            //                 calculateXP();
+            //             }
+            //         });
+            //     });
+            // }
+
+            // Initialize original countdown
+            updateTimeRemaining();
+            setInterval(updateTimeRemaining, 60000);
+        });
+
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            if (!messageContainer) {
+                // Create message container if it doesn't exist
+                const container = document.createElement('div');
+                container.id = 'messageContainer';
+                container.style.cssText = `
+                    margin: 1rem 0;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    text-align: center;
+                    transition: all 0.3s ease;
+                `;
+                const progressContainer = document.querySelector('.progress-container');
+                progressContainer.insertBefore(container, progressContainer.firstChild);
+            }
+
+            const container = document.getElementById('messageContainer');
+            container.textContent = message;
+            container.style.backgroundColor = type === 'success' ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)';
+            container.style.color = type === 'success' ? '#00aa00' : '#aa0000';
+
+            // Clear message after 5 seconds
+            setTimeout(() => {
+                container.style.opacity = '0';
+                setTimeout(() => {
+                    container.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Add this to your initialization code:
+        // document.querySelector('.main-content').insertAdjacentHTML('beforeend', newTimeSection);
+        updateAllCountdowns();
+        setInterval(updateAllCountdowns, 60000); // Update all countdowns every minute
+    </script>
+</body>
+</html>
